@@ -1,27 +1,46 @@
 body {
-  font-family: Arial;
-  background: #111;
-  color: #eee;
+  margin: 0;
+  font-family: "Inter", monospace;
+  background: linear-gradient(145deg, #0a0f1e, #05070d);
+  color: #e6e6e6;
+}
+
+header {
+  padding: 20px;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(10px);
 }
 
 .container {
-  display: flex;
+  display: grid;
+  grid-template-columns: 25% 45% 30%;
+  height: calc(100vh - 120px);
 }
 
-#fileTree {
-  width: 40%;
-  border-right: 1px solid #444;
-  overflow-y: auto;
-}
-
-#results {
-  width: 60%;
-  padding: 10px;
+#fileTree, #results, #filePreview {
+  padding: 15px;
+  overflow: auto;
+  border-right: 1px solid rgba(255,255,255,0.05);
 }
 
 .issue {
-  border-left: 4px solid red;
-  padding: 6px;
-  margin: 5px 0;
-  background: #222;
+  background: rgba(255,255,255,0.03);
+  border-left: 4px solid #00e0ff;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.issue.medium { border-color: #ffaa00; }
+.issue.high { border-color: #ff4d4d; }
+
+.progress {
+  height: 6px;
+  background: #111;
+}
+
+#progressBar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #00e0ff, #7cffcb);
+  transition: width 0.2s ease;
 }
