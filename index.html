@@ -1,57 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Mobile App Security Analyzer</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <link rel="stylesheet" href="style.css">
-
-  <!-- Browser-safe libraries -->
-  <script src="lib/jszip.min.js"></script>
-  <script src="lib/plist.browser.min.js"></script>
-  <script src="lib/jspdf.min.js"></script>
+  <title>Mobile App Analyzer – iOS IPA</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
-<header>
-  <h1>📱 Mobile App Security Analyzer</h1>
-  <p>100% Browser-Based Static Analysis (APK / IPA / ZIP)</p>
 
-  <input type="file" id="fileInput" accept=".apk,.ipa,.zip,.sdk">
+<h2>📱 iOS IPA Static Analyzer (Client-Side)</h2>
 
-  <div class="progress-container">
-    <div class="progress">
-      <div id="progressBar"></div>
-    </div>
-    <span id="progressText">Idle</span>
-  </div>
+<input type="file" id="ipaInput" accept=".ipa" />
 
-  <div class="export-buttons">
-    <button id="exportHTML">Export HTML</button>
-    <button id="exportPDF">Export PDF</button>
-    <button id="exportSARIF">Export SARIF</button>
-  </div>
-</header>
+<div class="container">
+  <div class="panel" id="fileTree"></div>
+  <div class="panel" id="fileViewer">Select a file</div>
+</div>
 
-<main class="container">
-  <section id="fileTree">
-    <h2>📂 File Explorer</h2>
-  </section>
+<h3>📌 Application Details</h3>
+<pre id="appDetails"></pre>
 
-  <section id="results">
-    <h2>🔍 Security Findings</h2>
-  </section>
+<h3>🚨 OWASP MASVS Findings</h3>
+<div id="dashboard"></div>
 
-  <section id="filePreviewContainer">
-    <h2>📄 File Preview</h2>
-    <pre id="filePreview">Select a file</pre>
-  </section>
-</main>
-
-<footer>
-  Client-side only • OWASP MASVS aligned • No uploads
-</footer>
+<script src="libs/jszip.min.js"></script>
+<script src="libs/plist.min.js"></script>
 
 <script type="module" src="app.js"></script>
 </body>
