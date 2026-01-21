@@ -1,4 +1,4 @@
-import { renderFileTree } from "./fileExplorer.js";
+import { renderFileTree } from "./analyzers/fileExplorer.js";
 
 const worker = new Worker("workers/scanWorker.js");
 const progressBar = document.getElementById("progressBar");
