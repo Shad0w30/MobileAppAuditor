@@ -1,46 +1,63 @@
 export function renderFileTree(zip) {
-  const tree = document.getElementById("fileTree");
-  tree.innerHTML = "";
+  const container = document.getElementById("fileTree");
+  container.innerHTML = "<h2>📂 File Explorer</h2>";
 
-  const root = {};
+  const tree = {};
 
-  Object.keys(zip.files).forEach(path => {
+  for (const path in zip.files) {
     const parts = path.split("/");
-    let current = root;
-    parts.forEach(p => {
-      if (!current[p]) current[p] = {};
-      current = current[p];
-    });
-  });
+    let node = tree;
 
-  tree.appendChild(buildNode(root, zip));
+    parts.forEach((p, i) => {
+      if (!node[p]) {
+        node[p] = { children: {}, path, isFile: i === parts.length - 1 && !zip.files[path].dir };
+      }
+      node = node[p].children;
+    });
+  }
+
+  container.appendChild(renderNode(tree, zip));
 }
 
-function buildNode(node, zip, prefix = "") {
+function renderNode(node, zip) {
   const ul = document.createElement("ul");
+  ul.className = "tree";
 
-  for (const key in node) {
+  for (const name in node) {
+    const entry = node[name];
     const li = document.createElement("li");
-    const fullPath = prefix + key;
 
-    if (Object.keys(node[key]).length) {
-      li.textContent = "📁 " + key;
-      li.appendChild(buildNode(node[key], zip, fullPath + "/"));
+    if (entry.isFile) {
+      li.textContent = `📄 ${name}`;
+      li.className = "file";
+      li.onclick = () => preview(zip, entry.path);
     } else {
-      li.textContent = "📄 " + key;
-      li.onclick = async () => {
-        const file = zip.file(fullPath);
-        if (!file) return;
+      li.textContent = `📁 ${name}`;
+      li.className = "folder";
 
-        const isText = /\.(xml|plist|smali|java|js|swift|kt)$/i.test(fullPath);
-        const content = isText
-          ? await file.async("text")
-          : "[Binary file – preview disabled]";
+      const child = renderNode(entry.children, zip);
+      child.style.display = "none";
 
-        document.getElementById("filePreview").textContent = content;
+      li.onclick = () => {
+        child.style.display = child.style.display === "none" ? "block" : "none";
       };
+
+      li.appendChild(child);
     }
+
     ul.appendChild(li);
   }
   return ul;
+}
+
+async function preview(zip, path) {
+  const preview = document.getElementById("filePreview");
+  const buf = await zip.files[path].async("arraybuffer");
+  const bytes = new Uint8Array(buf);
+
+  const isBinary = bytes.some(b => b === 0);
+
+  preview.textContent = isBinary
+    ? `===== ${path} =====\n\n[Binary file – preview disabled]\n\nUse string extraction or static analysis.`
+    : `===== ${path} =====\n\n${new TextDecoder().decode(bytes).slice(0, 15000)}`;
 }
