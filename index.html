@@ -3,93 +3,50 @@
 <head>
   <meta charset="UTF-8" />
   <title>Mobile App Security Analyzer</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- =========================
-       Styles
-       ========================= -->
   <link rel="stylesheet" href="style.css" />
 
-  <!-- =========================
-       Required Libraries
-       (Must exist in /lib)
-       ========================= -->
+  <!-- Browser-safe libs -->
   <script src="lib/jszip.min.js"></script>
-  <script src="lib/plist.min.js"></script>
+  <script src="lib/plist.browser.min.js"></script>
   <script src="lib/jspdf.min.js"></script>
 </head>
 
 <body>
+<header>
+  <h1>📱 Mobile App Security Analyzer</h1>
+  <p>100% Browser-Based • APK / IPA / ZIP • OWASP MASVS</p>
 
-  <!-- =========================
-       HEADER
-       ========================= -->
-  <header>
-    <h1>📱 Mobile App Security Analyzer</h1>
-    <p class="subtitle">
-      100% Browser-Based APK / IPA / ZIP Static Analysis  
-      <br>
-      OWASP MASVS • No Uploads • No Backend
-    </p>
+  <input type="file" id="fileInput" accept=".apk,.ipa,.zip,.sdk" />
 
-    <!-- File Upload -->
-    <input
-      type="file"
-      id="fileInput"
-      accept=".apk,.ipa,.zip,.sdk"
-    />
-
-    <!-- Progress Bar -->
-    <div class="progress-container">
-      <div class="progress">
-        <div id="progressBar"></div>
-      </div>
-      <span id="progressText">Idle</span>
+  <div class="progress-container">
+    <div class="progress">
+      <div id="progressBar"></div>
     </div>
-  </header>
+    <span id="progressText">Idle</span>
+  </div>
+</header>
 
-  <!-- =========================
-       MAIN CONTENT
-       ========================= -->
-  <main class="container">
+<main class="container">
+  <section id="fileTree">
+    <h2>📂 File Explorer</h2>
+  </section>
 
-    <!-- FILE EXPLORER -->
-    <section id="fileTree">
-      <h2>📂 File Explorer</h2>
-      <p class="hint">Upload a file to explore contents</p>
-    </section>
+  <section id="results">
+    <h2>🔍 Security Findings</h2>
+  </section>
 
-    <!-- FINDINGS -->
-    <section id="results">
-      <h2>🔍 Security Findings</h2>
-      <p class="hint">Scan results will appear here</p>
-    </section>
+  <section id="filePreviewContainer">
+    <h2>📄 File Preview</h2>
+    <pre id="filePreview">Select a file to preview</pre>
+  </section>
+</main>
 
-    <!-- FILE PREVIEW -->
-    <section id="filePreviewContainer">
-      <h2>📄 File Preview</h2>
-      <pre id="filePreview">Select a file to preview its contents</pre>
-    </section>
+<footer>
+  Client-side only • No uploads • MASVS aligned
+</footer>
 
-  </main>
-
-  <!-- =========================
-       FOOTER
-       ========================= -->
-  <footer>
-    <small>
-      Client-Side Mobile App Analyzer • OWASP MASVS aligned • No data leaves your browser
-    </small>
-  </footer>
-
-  <!-- =========================
-       MAIN APPLICATION SCRIPT
-       ========================= -->
-  <!-- IMPORTANT:
-       This MUST be type="module"
-       because app.js uses ES imports
-  -->
-  <script type="module" src="app.js"></script>
-
+<script type="module" src="app.js"></script>
 </body>
 </html>
