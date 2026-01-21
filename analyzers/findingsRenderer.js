@@ -7,10 +7,8 @@ export function renderFindings(findings) {
 
   for (const sev in groups) {
     if (!groups[sev].length) continue;
-
     const sec = document.createElement("div");
     sec.className = `severity ${sev.toLowerCase()}`;
-
     sec.innerHTML = `<h3>${sev} (${groups[sev].length})</h3>`;
 
     groups[sev].forEach(f => {
@@ -27,12 +25,12 @@ export function renderFindings(findings) {
       details.innerHTML = `
         <p>${f.description}</p>
         <p><b>File:</b> ${f.file}</p>
-        <p><b>Location:</b> ${f.location || "N/A"}</p>
-        <p><b>MASVS:</b> ${f.masvs || "-"}</p>
+        <p><b>Location:</b> ${f.location}</p>
+        <p><b>MASVS:</b> ${f.masvs}</p>
       `;
 
-      title.onclick = () =>
-        details.style.display = details.style.display === "none" ? "block" : "none";
+      title.onclick = () => details.style.display =
+        details.style.display === "none" ? "block" : "none";
 
       card.append(title, details);
       sec.appendChild(card);
