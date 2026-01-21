@@ -5,7 +5,12 @@ const input = document.getElementById("fileInput");
 const progressText = document.getElementById("progressText");
 const progressBar = document.getElementById("progressBar");
 
-const worker = new Worker("worker.js", { type: "module" });
+/**
+ * IMPORTANT:
+ * ❌ DO NOT use { type: "module" }
+ * This MUST be a classic worker
+ */
+const worker = new Worker("worker.js");
 
 worker.onmessage = e => {
   const { type, data } = e.data;
@@ -30,7 +35,8 @@ input.addEventListener("change", async e => {
   progressText.textContent = "Reading file...";
   progressBar.value = 5;
 
-  const buffer = await file.arrayBuffer(); // ✅ CLONEABLE
+  // ✅ ArrayBuffer is cloneable
+  const buffer = await file.arrayBuffer();
 
   worker.postMessage({
     filename: file.name,
