@@ -1,40 +1,42 @@
 import { renderFileTree } from "./analyzers/fileExplorer.js";
 import { renderFindings } from "./analyzers/findingsRenderer.js";
-import { extractDexStrings } from "./analyzers/dexStrings.js";
-import { scanSecrets } from "./analyzers/secrets.js";
-import { scoreMASVS } from "./analyzers/masvs.js";
+import { exportHTML, exportPDF, exportSARIF } from "./analyzers/reportExporter.js";
 
-const input = document.getElementById("fileInput");
+const worker = new Worker("worker.js", { type: "module" });
+
+const fileInput = document.getElementById("fileInput");
 const progressBar = document.getElementById("progressBar");
 const progressText = document.getElementById("progressText");
 
-input.addEventListener("change", async e => {
+let currentFindings = [];
+
+fileInput.addEventListener("change", async e => {
   const file = e.target.files[0];
   if (!file) return;
-
-  progressText.textContent = "Extracting archive...";
-  progressBar.style.width = "20%";
 
   const zip = await JSZip.loadAsync(file);
   renderFileTree(zip);
 
-  progressText.textContent = "Extracting strings...";
-  progressBar.style.width = "40%";
+  progressText.textContent = "Scanning…";
+  progressBar.style.width = "5%";
 
-  const dexStrings = await extractDexStrings(zip);
-
-  progressText.textContent = "Scanning secrets...";
-  progressBar.style.width = "60%";
-
-  const secretFindings = scanSecrets(dexStrings);
-
-  progressText.textContent = "Scoring MASVS...";
-  progressBar.style.width = "80%";
-
-  const masvsFindings = scoreMASVS(secretFindings);
-
-  renderFindings([...secretFindings, ...masvsFindings]);
-
-  progressBar.style.width = "100%";
-  progressText.textContent = "Scan complete";
+  worker.postMessage({ type: "scan", zip });
 });
+
+worker.onmessage = e => {
+  if (e.data.type === "progress") {
+    progressBar.style.width = `${e.data.percent}%`;
+    progressText.textContent = e.data.text;
+  }
+
+  if (e.data.type === "result") {
+    currentFindings = e.data.findings;
+    renderFindings(currentFindings);
+    progressBar.style.width = "100%";
+    progressText.textContent = "Scan complete";
+  }
+};
+
+document.getElementById("exportHTML").onclick = () => exportHTML(currentFindings);
+document.getElementById("exportPDF").onclick = () => exportPDF(currentFindings);
+document.getElementById("exportSARIF").onclick = () => exportSARIF(currentFindings);
