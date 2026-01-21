@@ -7,11 +7,8 @@ export function renderFileTree(zip) {
   for (const path in zip.files) {
     const parts = path.split("/");
     let node = tree;
-
     parts.forEach((p, i) => {
-      if (!node[p]) {
-        node[p] = { children: {}, path, isFile: i === parts.length - 1 && !zip.files[path].dir };
-      }
+      node[p] ??= { children: {}, path, isFile: i === parts.length - 1 && !zip.files[path].dir };
       node = node[p].children;
     });
   }
@@ -34,14 +31,9 @@ function renderNode(node, zip) {
     } else {
       li.textContent = `📁 ${name}`;
       li.className = "folder";
-
       const child = renderNode(entry.children, zip);
       child.style.display = "none";
-
-      li.onclick = () => {
-        child.style.display = child.style.display === "none" ? "block" : "none";
-      };
-
+      li.onclick = () => child.style.display = child.style.display === "none" ? "block" : "none";
       li.appendChild(child);
     }
 
@@ -51,13 +43,12 @@ function renderNode(node, zip) {
 }
 
 async function preview(zip, path) {
-  const preview = document.getElementById("filePreview");
+  const pre = document.getElementById("filePreview");
   const buf = await zip.files[path].async("arraybuffer");
   const bytes = new Uint8Array(buf);
+  const binary = bytes.some(b => b === 0);
 
-  const isBinary = bytes.some(b => b === 0);
-
-  preview.textContent = isBinary
-    ? `===== ${path} =====\n\n[Binary file – preview disabled]\n\nUse string extraction or static analysis.`
-    : `===== ${path} =====\n\n${new TextDecoder().decode(bytes).slice(0, 15000)}`;
+  pre.textContent = binary
+    ? `[Binary file – preview disabled]\n\n${path}`
+    : new TextDecoder().decode(bytes).slice(0, 15000);
 }
