@@ -1,71 +1,50 @@
 importScripts("../lib/jszip.min.js");
 
 self.onmessage = async (e) => {
-  const { fileBuffer, rules } = e.data;
-  const zip = await JSZip.loadAsync(fileBuffer);
-  const findings = [];
+  const { buffer } = e.data;
+  const zip = await JSZip.loadAsync(buffer);
 
-  for (const entry of Object.values(zip.files)) {
+  const findings = [];
+  let totalChecks = 0;
+  let completedChecks = 0;
+
+  const files = Object.values(zip.files);
+
+  for (const entry of files) {
     if (entry.dir) continue;
 
-    const isText =
-      entry.name.endsWith(".xml") ||
-      entry.name.endsWith(".plist") ||
-      entry.name.endsWith(".smali") ||
-      entry.name.endsWith(".java") ||
-      entry.name.endsWith(".js") ||
-      entry.name.endsWith(".swift");
+    totalChecks++;
 
-    let content = null;
+    const isText = /\.(xml|plist|smali|java|js|swift|kt)$/i.test(entry.name);
 
-    if (isText) {
-      try {
-        content = await entry.async("text");
-      } catch {
-        continue;
-      }
-    }
-
-    // 🔍 YARA-style scanning
-    if (content) {
-      for (const rule of rules) {
-        for (const pattern of rule.patterns) {
-          if (content.includes(pattern)) {
-            findings.push({
-              ruleId: rule.id,
-              file: entry.name,
-              severity: rule.severity,
-              masvs: rule.masvs,
-              message: rule.description
-            });
-            break;
-          }
-        }
-      }
-    }
-
-    // 🔬 Binary entropy check
     if (!isText) {
-      const buffer = await entry.async("uint8array");
-      const entropy = calculateEntropy(buffer);
+      const data = await entry.async("uint8array");
+      const entropy = calculateEntropy(data);
+
       if (entropy > 7.5) {
         findings.push({
-          ruleId: "HIGH_ENTROPY",
-          file: entry.name,
+          issue: "High-Entropy Binary Section Detected",
           severity: "Medium",
-          masvs: "MSTG-CRYPTO-1",
-          message: "High entropy binary (possible encryption/packing)"
+          category: "Obfuscation / Secrets Protection",
+          file: entry.name,
+          location: `Byte offset: 0x0 – 0x${data.length.toString(16)}`,
+          evidence: `Entropy score: ${entropy.toFixed(2)}`,
+          description:
+            "Binary contains high-entropy regions indicating encrypted, packed, or compressed data. Review runtime decryption logic and embedded secrets."
         });
       }
     }
+
+    completedChecks++;
+    postMessage({ progress: completedChecks, total: totalChecks });
   }
 
-  postMessage(findings);
+  postMessage({ done: true, findings });
 };
 
 function calculateEntropy(data) {
   const freq = new Array(256).fill(0);
-  data.forEach(b => freq[b]++);
+  for (const b of data) freq[b]++;
   let entropy = 0;
 
   for (const count of freq) {
