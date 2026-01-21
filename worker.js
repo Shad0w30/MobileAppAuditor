@@ -1,25 +1,74 @@
-import { extractDexStrings } from "./analyzers/dexStrings.js";
-import { scanSecrets } from "./analyzers/secrets.js";
-import { cryptoChecks } from "./analyzers/cryptoChecks.js";
-import { mapMASVS } from "./analyzers/masvs.js";
+importScripts("lib/jszip.min.js");
+importScripts("lib/plist.browser.min.js");
 
 self.onmessage = async e => {
-  if (e.data.type !== "scan") return;
+  const { filename, buffer } = e.data;
 
-  const zip = e.data.zip;
+  postProgress("Unpacking archive", 15);
+
+  const zip = await JSZip.loadAsync(buffer);
+
+  postProgress("Indexing files", 30);
+
+  const files = Object.keys(zip.files);
+
   let findings = [];
 
-  self.postMessage({ type: "progress", percent: 20, text: "Extracting DEX strings" });
-  const strings = await extractDexStrings(zip);
+  if (filename.endsWith(".apk")) {
+    findings = await analyzeAPK(zip);
+  } else if (filename.endsWith(".ipa")) {
+    findings = await analyzeIPA(zip);
+  }
 
-  self.postMessage({ type: "progress", percent: 40, text: "Detecting secrets" });
-  findings.push(...scanSecrets(strings));
+  postProgress("Finalizing results", 90);
 
-  self.postMessage({ type: "progress", percent: 60, text: "Crypto & TLS checks" });
-  findings.push(...cryptoChecks(strings));
-
-  self.postMessage({ type: "progress", percent: 80, text: "MASVS mapping" });
-  findings = mapMASVS(findings);
-
-  self.postMessage({ type: "result", findings });
+  self.postMessage({
+    type: "result",
+    data: { files, findings }
+  });
 };
+
+function postProgress(text, value) {
+  self.postMessage({
+    type: "progress",
+    data: { text, value }
+  });
+}
+
+/* ================= ANALYZERS ================= */
+
+async function analyzeAPK(zip) {
+  const results = [];
+
+  for (const path in zip.files) {
+    if (/md5/i.test(path)) {
+      results.push({
+        severity: "high",
+        title: "Insecure Hash Algorithm (MD5)",
+        description: "MD5 is cryptographically broken.",
+        file: path,
+        location: "File name / reference"
+      });
+    }
+  }
+
+  return results;
+}
+
+async function analyzeIPA(zip) {
+  const results = [];
+
+  for (const path in zip.files) {
+    if (path.endsWith("Info.plist")) {
+      results.push({
+        severity: "medium",
+        title: "Info.plist Detected",
+        description: "Review ATS and entitlements.",
+        file: path,
+        location: "Root bundle"
+      });
+    }
+  }
+
+  return results;
+}
