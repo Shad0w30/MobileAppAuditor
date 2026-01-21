@@ -6,8 +6,8 @@ body {
 }
 
 header {
-  padding: 20px;
-  background: linear-gradient(135deg, #020617, #020617);
+  padding: 16px;
+  background: #020617;
   border-bottom: 1px solid #1e293b;
 }
 
@@ -21,7 +21,7 @@ header {
 section {
   background: #020617;
   border: 1px solid #1e293b;
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 10px;
   overflow: auto;
 }
@@ -38,7 +38,7 @@ ul.tree {
 
 .file {
   cursor: pointer;
-  padding-left: 10px;
+  padding-left: 8px;
 }
 
 .finding {
@@ -49,8 +49,8 @@ ul.tree {
 
 .finding-title {
   padding: 6px;
-  cursor: pointer;
   font-weight: bold;
+  cursor: pointer;
 }
 
 .finding-details {
@@ -59,12 +59,11 @@ ul.tree {
 }
 
 .severity.critical { border-left: 4px solid #ef4444; }
-.severity.high     { border-left: 4px solid #f97316; }
-.severity.medium   { border-left: 4px solid #eab308; }
-.severity.low      { border-left: 4px solid #22c55e; }
+.severity.high { border-left: 4px solid #f97316; }
+.severity.medium { border-left: 4px solid #eab308; }
+.severity.low { border-left: 4px solid #22c55e; }
 
 .progress {
-  width: 100%;
   height: 8px;
   background: #1e293b;
   border-radius: 6px;
@@ -74,4 +73,8 @@ ul.tree {
   height: 100%;
   width: 0%;
   background: linear-gradient(90deg, #22d3ee, #818cf8);
+}
+
+button {
+  margin-right: 6px;
 }
