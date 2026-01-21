@@ -6,16 +6,15 @@ export async function extractDexStrings(zip) {
 
     const buf = await zip.files[name].async("arraybuffer");
     const bytes = new Uint8Array(buf);
+    let cur = [];
 
-    let current = [];
-    for (let i = 0; i < bytes.length; i++) {
-      if (bytes[i] >= 32 && bytes[i] <= 126) {
-        current.push(bytes[i]);
-      } else if (current.length >= 6) {
-        results.push({ file: name, value: new TextDecoder().decode(new Uint8Array(current)) });
-        current = [];
-      } else {
-        current = [];
+    for (const b of bytes) {
+      if (b >= 32 && b <= 126) cur.push(b);
+      else {
+        if (cur.length >= 6) {
+          results.push({ file: name, value: new TextDecoder().decode(new Uint8Array(cur)) });
+        }
+        cur = [];
       }
     }
   }
