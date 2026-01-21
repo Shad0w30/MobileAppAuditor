@@ -2,64 +2,94 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Browser Mobile Security Analyzer</title>
+  <title>Mobile App Security Analyzer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <!-- =========================
+       Styles
+       ========================= -->
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Libraries -->
+  <!-- =========================
+       Required Libraries
+       (Must exist in /lib)
+       ========================= -->
   <script src="lib/jszip.min.js"></script>
   <script src="lib/plist.min.js"></script>
   <script src="lib/jspdf.min.js"></script>
 </head>
 
 <body>
-  <header>
-    <h1>📱 Browser-Based Mobile App Security Analyzer</h1>
-    <p>
-      100% Client-Side APK / IPA / ZIP / SDK Static Security Scanner<br />
-      OWASP MASVS • SARIF • No Uploads • No Backend
-    </p>
-  </header>
 
-  <section class="upload">
+  <!-- =========================
+       HEADER
+       ========================= -->
+  <header>
+    <h1>📱 Mobile App Security Analyzer</h1>
+    <p class="subtitle">
+      100% Browser-Based APK / IPA / ZIP Static Analysis  
+      <br>
+      OWASP MASVS • No Uploads • No Backend
+    </p>
+
+    <!-- File Upload -->
     <input
       type="file"
       id="fileInput"
       accept=".apk,.ipa,.zip,.sdk"
     />
-    <span id="status">Idle</span>
-  </section>
 
-  <section class="actions">
-    <button id="btnHtml" disabled>📄 Export HTML</button>
-    <button id="btnSarif" disabled>🧾 Export SARIF</button>
-  </section>
+    <!-- Progress Bar -->
+    <div class="progress-container">
+      <div class="progress">
+        <div id="progressBar"></div>
+      </div>
+      <span id="progressText">Idle</span>
+    </div>
+  </header>
 
+  <!-- =========================
+       MAIN CONTENT
+       ========================= -->
   <main class="container">
-    <div id="fileTree">
-      <h2>📂 File Explorer</h2>
-      <p class="hint">Files will appear after upload</p>
-    </div>
 
-    <div id="results">
-      <h2>🔍 Findings</h2>
-      <p class="hint">No scan results yet</p>
-    </div>
+    <!-- FILE EXPLORER -->
+    <section id="fileTree">
+      <h2>📂 File Explorer</h2>
+      <p class="hint">Upload a file to explore contents</p>
+    </section>
+
+    <!-- FINDINGS -->
+    <section id="results">
+      <h2>🔍 Security Findings</h2>
+      <p class="hint">Scan results will appear here</p>
+    </section>
+
+    <!-- FILE PREVIEW -->
+    <section id="filePreviewContainer">
+      <h2>📄 File Preview</h2>
+      <pre id="filePreview">Select a file to preview its contents</pre>
+    </section>
+
   </main>
 
+  <!-- =========================
+       FOOTER
+       ========================= -->
   <footer>
     <small>
-      Client-Side Analyzer • OWASP MASVS-aligned • No data leaves your browser
+      Client-Side Mobile App Analyzer • OWASP MASVS aligned • No data leaves your browser
     </small>
   </footer>
 
-  <!-- Main App Logic -->
+  <!-- =========================
+       MAIN APPLICATION SCRIPT
+       ========================= -->
+  <!-- IMPORTANT:
+       This MUST be type="module"
+       because app.js uses ES imports
+  -->
   <script type="module" src="app.js"></script>
 
-  <!-- Safety: Disable accidental form submits -->
-  <script>
-    document.addEventListener("submit", e => e.preventDefault());
-  </script>
 </body>
 </html>
