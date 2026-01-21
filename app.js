@@ -1,48 +1,49 @@
-import { yaraRules } from "./rules/yaraRules.js";
-import { exportSARIF } from "./exporters/sarifExporter.js";
-import { exportHTML } from "./exporters/htmlReport.js";
+import { renderFileTree } from "./fileExplorer.js";
 
-const worker = new Worker("./workers/scanWorker.js");
+const worker = new Worker("workers/scanWorker.js");
+const progressBar = document.getElementById("progressBar");
+const progressText = document.getElementById("progressText");
 
-document.getElementById("fileInput").addEventListener("change", async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  document.getElementById("status").textContent = "Scanning...";
-
-  const buffer = await file.arrayBuffer();
-  worker.postMessage({ fileBuffer: buffer, rules: yaraRules });
-
-  worker.onmessage = (event) => {
-    const findings = event.data;
-    document.getElementById("status").textContent =
-      `Scan completed: ${findings.length} findings`;
-
-    renderResults(findings);
-
-    // Optional exports
-    window.exportSARIF = () => exportSARIF(findings);
-    window.exportHTML = () => exportHTML(findings);
-  };
-});
-
-function renderResults(findings) {
-  const el = document.getElementById("results");
-  el.innerHTML = "<h2>Findings</h2>";
-
-  if (!findings.length) {
-    el.innerHTML += "<p>No issues detected.</p>";
-    return;
+worker.onmessage = (e) => {
+  if (e.data.progress !== undefined) {
+    const percent = Math.round((e.data.progress / e.data.total) * 100);
+    progressBar.style.width = percent + "%";
+    progressText.textContent =
+      `Scanning ${e.data.progress} / ${e.data.total} checks`;
   }
+
+  if (e.data.done) {
+    renderFindings(e.data.findings);
+    progressText.textContent = `Scan completed – ${e.data.findings.length} findings`;
+  }
+};
+
+document.getElementById("fileInput").onchange = async (e) => {
+  const file = e.target.files[0];
+  const buffer = await file.arrayBuffer();
+
+  progressBar.style.width = "0%";
+  progressText.textContent = "Initializing scan…";
+
+  const zip = await JSZip.loadAsync(buffer);
+  renderFileTree(zip);
+
+  worker.postMessage({ buffer });
+};
+
+function renderFindings(findings) {
+  const el = document.getElementById("results");
+  el.innerHTML = "";
 
   findings.forEach(f => {
     el.innerHTML += `
-      <div class="issue">
-        <b>${f.ruleId}</b><br>
-        File: ${f.file}<br>
-        Severity: ${f.severity}<br>
-        MASVS: ${f.masvs}<br>
-        ${f.message}
+      <div class="issue ${f.severity.toLowerCase()}">
+        <h3>${f.issue}</h3>
+        <p>${f.description}</p>
+        <b>File:</b> ${f.file}<br>
+        <b>Location:</b> ${f.location}<br>
+        <b>Evidence:</b> ${f.evidence}<br>
+        <b>Severity:</b> ${f.severity}
       </div>
     `;
   });
