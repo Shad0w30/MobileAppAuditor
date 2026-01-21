@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Mobile App Security Analyzer</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 
-  <!-- Browser-safe libs -->
+  <!-- Browser-safe libraries -->
   <script src="lib/jszip.min.js"></script>
   <script src="lib/plist.browser.min.js"></script>
   <script src="lib/jspdf.min.js"></script>
@@ -16,15 +16,21 @@
 <body>
 <header>
   <h1>📱 Mobile App Security Analyzer</h1>
-  <p>100% Browser-Based • APK / IPA / ZIP • OWASP MASVS</p>
+  <p>100% Browser-Based Static Analysis (APK / IPA / ZIP)</p>
 
-  <input type="file" id="fileInput" accept=".apk,.ipa,.zip,.sdk" />
+  <input type="file" id="fileInput" accept=".apk,.ipa,.zip,.sdk">
 
   <div class="progress-container">
     <div class="progress">
       <div id="progressBar"></div>
     </div>
     <span id="progressText">Idle</span>
+  </div>
+
+  <div class="export-buttons">
+    <button id="exportHTML">Export HTML</button>
+    <button id="exportPDF">Export PDF</button>
+    <button id="exportSARIF">Export SARIF</button>
   </div>
 </header>
 
@@ -39,12 +45,12 @@
 
   <section id="filePreviewContainer">
     <h2>📄 File Preview</h2>
-    <pre id="filePreview">Select a file to preview</pre>
+    <pre id="filePreview">Select a file</pre>
   </section>
 </main>
 
 <footer>
-  Client-side only • No uploads • MASVS aligned
+  Client-side only • OWASP MASVS aligned • No uploads
 </footer>
 
 <script type="module" src="app.js"></script>
