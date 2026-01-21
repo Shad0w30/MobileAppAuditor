@@ -1,50 +1,40 @@
 import { renderFileTree } from "./analyzers/fileExplorer.js";
+import { renderFindings } from "./analyzers/findingsRenderer.js";
+import { extractDexStrings } from "./analyzers/dexStrings.js";
+import { scanSecrets } from "./analyzers/secrets.js";
+import { scoreMASVS } from "./analyzers/masvs.js";
 
-const worker = new Worker("workers/scanWorker.js");
+const input = document.getElementById("fileInput");
 const progressBar = document.getElementById("progressBar");
 const progressText = document.getElementById("progressText");
 
-worker.onmessage = (e) => {
-  if (e.data.progress !== undefined) {
-    const percent = Math.round((e.data.progress / e.data.total) * 100);
-    progressBar.style.width = percent + "%";
-    progressText.textContent =
-      `Scanning ${e.data.progress} / ${e.data.total} checks`;
-  }
-
-  if (e.data.done) {
-    renderFindings(e.data.findings);
-    progressText.textContent = `Scan completed – ${e.data.findings.length} findings`;
-  }
-};
-
-document.getElementById("fileInput").onchange = async (e) => {
+input.addEventListener("change", async e => {
   const file = e.target.files[0];
-  const buffer = await file.arrayBuffer();
+  if (!file) return;
 
-  progressBar.style.width = "0%";
-  progressText.textContent = "Initializing scan…";
+  progressText.textContent = "Extracting archive...";
+  progressBar.style.width = "20%";
 
-  const zip = await JSZip.loadAsync(buffer);
+  const zip = await JSZip.loadAsync(file);
   renderFileTree(zip);
 
-  worker.postMessage({ buffer });
-};
+  progressText.textContent = "Extracting strings...";
+  progressBar.style.width = "40%";
 
-function renderFindings(findings) {
-  const el = document.getElementById("results");
-  el.innerHTML = "";
+  const dexStrings = await extractDexStrings(zip);
 
-  findings.forEach(f => {
-    el.innerHTML += `
-      <div class="issue ${f.severity.toLowerCase()}">
-        <h3>${f.issue}</h3>
-        <p>${f.description}</p>
-        <b>File:</b> ${f.file}<br>
-        <b>Location:</b> ${f.location}<br>
-        <b>Evidence:</b> ${f.evidence}<br>
-        <b>Severity:</b> ${f.severity}
-      </div>
-    `;
-  });
-}
+  progressText.textContent = "Scanning secrets...";
+  progressBar.style.width = "60%";
+
+  const secretFindings = scanSecrets(dexStrings);
+
+  progressText.textContent = "Scoring MASVS...";
+  progressBar.style.width = "80%";
+
+  const masvsFindings = scoreMASVS(secretFindings);
+
+  renderFindings([...secretFindings, ...masvsFindings]);
+
+  progressBar.style.width = "100%";
+  progressText.textContent = "Scan complete";
+});
