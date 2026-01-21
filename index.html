@@ -1,29 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Mobile Security Analyzer</title>
-
-  <!-- Libraries -->
-  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-  <script src="https://unpkg.com/axml-parser/dist/axml-parser.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/plist@3.0.6/dist/plist.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-
-  <style>
-    body { font-family: Arial; padding: 20px; }
-    .high { color: red; }
-    .medium { color: orange; }
-    .low { color: green; }
-  </style>
+  <title>Browser App Security Analyzer</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-  <h1>Mobile App Security Analyzer (Client-Side)</h1>
-  <input type="file" id="fileInput" />
-  <button onclick="startScan()">Analyze</button>
+<h1>📱 Client-Side APK / IPA Security Analyzer</h1>
 
+<input type="file" id="fileInput" accept=".apk,.ipa,.zip,.sdk">
+<div id="status"></div>
+
+<div class="container">
+  <div id="fileTree"></div>
   <div id="results"></div>
+</div>
 
-  <script type="module" src="./src/main.js"></script>
+<script src="lib/jszip.min.js"></script>
+<script src="lib/plist.min.js"></script>
+
+<script type="module" src="app.js"></script>
 </body>
 </html>

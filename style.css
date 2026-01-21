@@ -1,0 +1,27 @@
+body {
+  font-family: Arial;
+  background: #111;
+  color: #eee;
+}
+
+.container {
+  display: flex;
+}
+
+#fileTree {
+  width: 40%;
+  border-right: 1px solid #444;
+  overflow-y: auto;
+}
+
+#results {
+  width: 60%;
+  padding: 10px;
+}
+
+.issue {
+  border-left: 4px solid red;
+  padding: 6px;
+  margin: 5px 0;
+  background: #222;
+}
