@@ -1,23 +1,65 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Browser App Security Analyzer</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Browser Mobile Security Analyzer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Libraries -->
+  <script src="lib/jszip.min.js"></script>
+  <script src="lib/plist.min.js"></script>
+  <script src="lib/jspdf.min.js"></script>
 </head>
+
 <body>
-<h1>📱 Client-Side APK / IPA Security Analyzer</h1>
+  <header>
+    <h1>📱 Browser-Based Mobile App Security Analyzer</h1>
+    <p>
+      100% Client-Side APK / IPA / ZIP / SDK Static Security Scanner<br />
+      OWASP MASVS • SARIF • No Uploads • No Backend
+    </p>
+  </header>
 
-<input type="file" id="fileInput" accept=".apk,.ipa,.zip,.sdk">
-<div id="status"></div>
+  <section class="upload">
+    <input
+      type="file"
+      id="fileInput"
+      accept=".apk,.ipa,.zip,.sdk"
+    />
+    <span id="status">Idle</span>
+  </section>
 
-<div class="container">
-  <div id="fileTree"></div>
-  <div id="results"></div>
-</div>
+  <section class="actions">
+    <button id="btnHtml" disabled>📄 Export HTML</button>
+    <button id="btnSarif" disabled>🧾 Export SARIF</button>
+  </section>
 
-<script src="lib/jszip.min.js"></script>
-<script src="lib/plist.min.js"></script>
+  <main class="container">
+    <div id="fileTree">
+      <h2>📂 File Explorer</h2>
+      <p class="hint">Files will appear after upload</p>
+    </div>
 
-<script type="module" src="app.js"></script>
+    <div id="results">
+      <h2>🔍 Findings</h2>
+      <p class="hint">No scan results yet</p>
+    </div>
+  </main>
+
+  <footer>
+    <small>
+      Client-Side Analyzer • OWASP MASVS-aligned • No data leaves your browser
+    </small>
+  </footer>
+
+  <!-- Main App Logic -->
+  <script type="module" src="app.js"></script>
+
+  <!-- Safety: Disable accidental form submits -->
+  <script>
+    document.addEventListener("submit", e => e.preventDefault());
+  </script>
 </body>
 </html>
